@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  app:
+    image: ${IMAGE_NAME:-ghcr.io/TODO_ORG/python-boilerplate:latest}  # TODO
+    container_name: python-boilerplate  # TODO rename
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

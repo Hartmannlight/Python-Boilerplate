@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    image: python-boilerplate-dev  # TODO rename
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+    environment:
+      APP_ENV: dev
+      LOG_LEVEL: DEBUG

@@ -1,6 +1,20 @@
 fail_fast: true
 
 repos:
+  - repo: local
+    hooks:
+      - id: repo-state-check
+        name: repo-state-check
+        entry: poetry run python scripts/repo_state_check_gui.py
+        language: system
+        pass_filenames: false
+
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy src
+        language: system
+        pass_filenames: false
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -15,11 +29,3 @@ repos:
     hooks:
       - id: ruff
       - id: ruff-format
-
-  - repo: local
-    hooks:
-      - id: mypy
-        name: mypy
-        entry: poetry run mypy src
-        language: system
-        pass_filenames: false

@@ -1,30 +1,12 @@
+# src/app/logging_setup.py
 from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
 
 from app.config import AppConfig
-
-
-class AccessLogFilter(logging.Filter):
-    def __init__(self, ignore_paths: Iterable[str]) -> None:
-        super().__init__()
-        self._ignore_paths = tuple(ignore_paths)
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        if record.name != 'uvicorn.access':
-            return True
-
-        msg = record.getMessage()
-
-        for path in self._ignore_paths:
-            if f'"GET {path} ' in msg or f'"HEAD {path} ' in msg:
-                return False
-
-        return True
 
 
 class JsonFormatter(logging.Formatter):
@@ -73,6 +55,9 @@ class JsonFormatter(logging.Formatter):
                 continue
             payload[key] = value
 
+        if record.levelno >= logging.ERROR and 'error' not in payload:
+            payload['error'] = record.getMessage()
+
         if record.exc_info:
             payload['stack'] = self.formatException(record.exc_info)
             if record.exc_info[0]:
@@ -83,13 +68,13 @@ class JsonFormatter(logging.Formatter):
 
 def configure_logging(config: AppConfig) -> None:
     root = logging.getLogger()
-    root.setLevel(config.log_level)
+
+    level_name = (config.log_level or 'INFO').upper()
+    level = getattr(logging, level_name, logging.INFO)
+    root.setLevel(level)
 
     handler = logging.StreamHandler()
     handler.setFormatter(JsonFormatter(config))
-
-    ignore_paths = ['/metrics', '/healthz', '/readyz']
-    handler.addFilter(AccessLogFilter(ignore_paths))
 
     root.handlers.clear()
     root.addHandler(handler)

@@ -1,3 +1,4 @@
+# Python-Boilerplate/.github/workflows/lint.yml
 name: lint
 
 on:
@@ -8,6 +9,7 @@ on:
 jobs:
   lint-and-tests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'  # TODO: keep in sync with pyproject.toml
+          python-version: '3.11'
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v3
@@ -30,9 +32,6 @@ jobs:
 
       - name: Run pre-commit
         run: poetry run pre-commit run --all-files
-
-      - name: Run mypy
-        run: poetry run mypy src
 
       - name: Run tests
         run: poetry run pytest

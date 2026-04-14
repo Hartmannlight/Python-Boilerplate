@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "boilerplate", "health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

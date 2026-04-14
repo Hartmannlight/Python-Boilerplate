@@ -1,57 +1,62 @@
-# C:\Users\Nathaniel\PycharmProjects\Python-Boilerplate\pyproject.toml
-[tool.poetry]
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
 name = "python-boilerplate"
 version = "0.1.0"
-description = "Minimal Python service boilerplate with metrics, logging, and Docker."
-authors = ["Nathaniel <hartmannlight@gmail.com>"]
+description = "Opinionated Python service boilerplate with uv and mandatory observability."
 readme = "README.md"
-packages = [{ include = "app", from = "src" }]
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Nathaniel", email = "hartmannlight@gmail.com" },
+]
+dependencies = [
+  "opentelemetry-exporter-otlp-proto-http>=1.33.0",
+  "opentelemetry-sdk>=1.33.0",
+  "prometheus-client>=0.22.0",
+  "sentry-sdk>=2.26.0",
+  "structlog>=25.2.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-prometheus-client = "^0.23.0"
-python-dotenv = "^1.0.1"
-pyyaml = "^6.0.2"
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.15",
+  "pytest>=8.3",
+  "pytest-cov>=5.0",
+  "ruff>=0.11",
+]
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.7.1"
-mypy = "^1.11.2"
-pytest = "^8.3.0"
-coverage = "^7.6.0"
-pre-commit = "^4.0.1"
-pyperclip = "^1.9.0"
-types-PyYAML = "^6.0.12.20240808"
+[project.scripts]
+boilerplate = "python_boilerplate.cli:main"
 
-[tool.poetry.scripts]
-app-sync = "app.main_sync:main"
-app-async = "app.main_async:main"
-app-health = "app.health:main"
+[tool.hatch.build.targets.wheel]
+packages = ["src/python_boilerplate"]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+  "mypy>=1.15",
+  "pytest>=8.3",
+  "pytest-cov>=5.0",
+  "ruff>=0.11",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
-
-[tool.ruff.format]
-quote-style = "single"
-line-ending = "lf"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = true
-ignore_missing_imports = false
-warn_unused_ignores = true
-warn_unreachable = true
+files = ["src", "tests"]
 
-[tool.coverage.run]
-branch = true
-source = ["app"]
-
-[tool.coverage.report]
-show_missing = true
+[tool.uv]
+default-groups = ["dev"]

@@ -1,28 +1,17 @@
-# Python-Boilerplate/Dockerfile
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV UV_LINK_MODE=copy
+ENV UV_COMPILE_BYTECODE=1
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential && \
-    rm -rf /var/lib/apt/lists/*
+COPY pyproject.toml uv.lock README.md ./
+COPY src ./src
 
-ARG APP_VERSION=0.0.0
-ARG APP_COMMIT=unknown
+RUN uv sync --frozen --no-dev
 
-ENV APP_VERSION=$APP_VERSION
-ENV APP_COMMIT=$APP_COMMIT
+ENV PATH="/app/.venv/bin:$PATH"
 
-COPY pyproject.toml poetry.lock* /app/
-
-RUN pip install --no-cache-dir poetry && \
-    poetry install --no-root --only main
-
-COPY src /app/src
-ENV PYTHONPATH=/app/src
-
-EXPOSE 8000
-
-CMD ["poetry", "run", "app"]
+CMD ["boilerplate", "run"]
